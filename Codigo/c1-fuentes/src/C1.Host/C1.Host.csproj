@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\C1.Adaptadores.Entrada\C1.Adaptadores.Entrada.csproj" />
+    <ProjectReference Include="..\C1.Adaptadores.Salida\C1.Adaptadores.Salida.csproj" />
+    <ProjectReference Include="..\C1.Nucleo\C1.Nucleo.csproj" />
+    <ProjectReference Include="..\C1.Contracts\C1.Contracts.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
