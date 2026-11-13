@@ -1,12 +1,12 @@
 # Hogar Andino · Gobierno de datos (Ley 1581)
 
-Implementación de **dos dominios** del diseño de gobierno de datos de **Hogar Andino Inmobiliaria S.A.S.**, hecho con ArchiMate y DDD en la Entrega 3 y llevado a código para la Evaluación Final de **Arquitectura de Software**.
+Implementación de **dos dominios** del diseño de gobierno de datos de **Hogar Andino Inmobiliaria S.A.S.**, hecho con ArchiMate y DDD en la Evaluación 3 y llevado a código para la Evaluación Final de **Arquitectura de Software**.
 
 > Un dominio está construido con **arquitectura hexagonal (C#)** y el otro con **microservicios (Python)**. Los demás dominios del diseño (C3 a C7) se **simulan** para mostrar cómo se comunican.
 
 ---
 
-##  ¿Qué problema resuelve?
+## ¿Qué problema resuelve?
 
 Hogar Andino maneja información de arrendamientos, contabilidad, clientes y sitio web repartida en varios sistemas. Nadie tiene un inventario claro de **dónde está cada dato, qué significa y quién responde por él**, y eso es un riesgo frente a la **Ley 1581 de 2012** (protección de datos personales en Colombia).
 
@@ -17,11 +17,9 @@ El proyecto implementa el corazón de ese inventario:
 | **C1 · Fuentes y metadatos técnicos** | Registra las fuentes de datos, controla quién autoriza leer su estructura, importa los metadatos técnicos (tablas y columnas), guarda versiones y detecta cambios | **Hexagonal** (puertos y adaptadores) | C# / .NET 10 | `8011` |
 | **C2 · Atributos de negocio** *(dominio principal)* | Describe cada atributo una sola vez: definición, política de calidad y expresión regular. Marca lo que está incompleto | **Microservicios** | Python 3.13 / FastAPI | `8012` |
 
-**Regla de oro del diseño:** C1 guarda solo la *estructura* (nombres de columnas, tipos), **nunca datos de personas**.
-
 ---
 
-##  Tecnologías y herramientas
+## Tecnologías y herramientas
 
 - **C1:** C# · .NET 10 · ASP.NET Core (Minimal API) · SQLite · xUnit
 - **C2:** Python 3.13 · FastAPI · Uvicorn · SQLite · `cryptography` (Fernet) · pytest
@@ -42,59 +40,7 @@ El proyecto implementa el corazón de ese inventario:
 
 ---
 
-##  Estructura del repositorio
-
-```text
-Inmobiliaria/
-├── Archimate/          # Diseño de la Entrega 3 (.archimate) [confirmar nombre del archivo]
-├── Codigo/             # Implementación de los dos dominios
-│   ├── c1-fuentes/     # C1 · hexagonal · C#
-│   ├── c2-atributos/   # C2 · microservicio · Python
-│   ├── herramientas/   # Script que genera las vistas de ArchiMate desde el código
-│   ├── docker-compose.yml
-│   └── .env.example    # Copiar como .env (nunca subir el .env real)
-└── Vistas/             # Vistas generadas automáticamente para Archi (XML) [confirmar contenido]
-```
-
-### C1 · Fuentes y metadatos técnicos (hexagonal)
-
-```text
-c1-fuentes/
-├── src/
-│   ├── C1.Nucleo/                 # El "interior" del hexágono: no conoce HTTP ni SQLite
-│   │   ├── Dominio/               #   Fuente, Autorización, Versión, Cambio, Aviso, eventos
-│   │   ├── Puertos/Entrada/       #   Comandos, consultas y DTOs (lo que el mundo le pide al núcleo)
-│   │   ├── Puertos/Salida/        #   Interfaces que el núcleo necesita (repositorios, reloj, lectores...)
-│   │   └── Aplicacion/            #   Manejadores, Mediador y pipeline
-│   ├── C1.Adaptadores.Entrada/    # API REST (rutas /v1/...)
-│   ├── C1.Adaptadores.Salida/     # SQLite, cifrado, caché, mensajería y simulaciones (A1, A2, C7)
-│   ├── C1.Contracts/              # Contratos públicos versionados (V1) que otros contextos consumen
-│   ├── C1.Host/                   # Raíz de composición: conecta cada puerto con su adaptador
-│   └── C1.Cliente/                # Cliente de consola
-└── tests/C1.Pruebas/              # 71 pruebas
-```
-
-### C2 · Atributos de negocio (microservicio)
-
-```text
-c2-atributos/
-├── c2_atributos/
-│   ├── dominio/           # Atributo de negocio (agregado), reglas, especificación "incompleto", eventos
-│   ├── aplicacion/        # Comandos, consultas, manejadores, mediador, pipeline, outbox, puertos
-│   ├── infraestructura/   # SQLite, caché, cifrado, bus de eventos, outbox/inbox
-│   ├── api/               # Rutas REST (/v1/...) y errores estándar (ProblemDetails)
-│   ├── contracts/         # Contratos públicos versionados (v1)
-│   ├── simulacion/        # C4 y C6 simulados
-│   ├── cliente/           # Cliente de consola
-│   └── building_blocks/   # Piezas genéricas: errores, memento, reloj
-├── tests/                 # 51 pruebas
-├── Dockerfile
-└── requirements.txt
-```
-
----
-
-##  Cómo ejecutarlo
+## Cómo ejecutarlo
 
 ### Requisitos
 
@@ -109,15 +55,18 @@ c2-atributos/
    ```powershell
    cd Codigo
    ```
-2. Crea tu archivo de variables a partir del ejemplo y cambia las claves por frases largas y secretas:
+2. Crea tu archivo de variables a partir del ejemplo:
    ```powershell
    Copy-Item .env.example .env
    ```
-   ```env
-   C1_CLAVE_CIFRADO=cambie-esta-clave-por-una-larga-y-secreta
-   C2_CLAVE_CIFRADO=cambie-esta-otra-clave-por-una-larga-y-secreta
+   Abre el `.env` y cambia las dos claves por valores largos y aleatorios. Puedes generar cada una con este comando (ejecútalo dos veces, una por clave):
+   ```powershell
+   $b = New-Object byte[] 32; [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); [Convert]::ToBase64String($b)
    ```
-   >  **Nunca subas el `.env` real al repositorio.** [Confirmar los nombres exactos de variables en tu `docker-compose.yml`.]
+   ```env
+   C1_CLAVE_CIFRADO=<clave-larga-para-C1>
+   C2_CLAVE_CIFRADO=<clave-larga-para-C2>
+   ```
 3. Levanta los dos servicios:
    ```powershell
    docker compose up --build
@@ -130,6 +79,8 @@ c2-atributos/
    Si C1 aún dice que está arrancando, espera unos segundos y repite.
 
 C2 arranca primero y C1 le envía sus eventos (`C2_URL=http://c2:8012` dentro de Docker).
+
+> **Solo C2 con Docker:** la carpeta `c2-atributos` tiene su propio `docker-compose.yml`. Desde `Codigo\c2-atributos` ejecuta `docker compose up --build`.
 
 ### Opción B · Local, sin Docker
 
@@ -150,8 +101,6 @@ cd Codigo\c1-fuentes
 $env:C2_URL = "http://localhost:8012"    # opcional: para que C1 le envíe sus eventos a C2 de verdad
 dotnet run --project src\C1.Host --urls http://localhost:8011
 ```
-
-En modo desarrollo no hace falta definir claves: se usan unas de prueba. **Fuera de desarrollo la clave es obligatoria.**
 
 ### Clientes de consola
 
@@ -197,7 +146,7 @@ Resultado esperado: **71 pruebas en C1** y **51 en C2**.
 
 ---
 
-##  Rutas principales
+## Rutas principales
 
 **C2 · Atributos de negocio** (`http://localhost:8012`)
 
@@ -227,7 +176,7 @@ En C1 el usuario se indica con el encabezado `X-Usuario` (representa la autentic
 
 ---
 
-##  ¿Qué está simulado?
+## ¿Qué está simulado?
 
 El diseño tiene siete contextos. Solo implementamos C1 y C2; el resto se **simula** para demostrar la interoperabilidad:
 
@@ -240,23 +189,23 @@ Las rutas `/v1/simulacion/...` permiten ver qué recibió cada contexto simulado
 
 ---
 
-##  Diseño y vistas de ArchiMate
+## Diseño y vistas de ArchiMate
 
-El diseño original (Entrega 3) está en `Archimate/`. Además, un script **lee el código real y genera las vistas de ArchiMate** (ingeniería inversa), con 4 vistas por dominio: estructura, contratos y servicios, puertos y adaptadores, y comandos con eventos.
-
-```powershell
-python .\herramientas\ingenieria_inversa_archimate.py --raiz ".\Codigo" --salida .\Vistas --diseno ".\Archimate\<tu-archivo>.archimate"
-```
-
-Luego, en Archi: **File → Import → Open Exchange XML Model…** y elige `modelo_c1_c2.xml`. El script también genera un reporte que compara el código con el diseño.
+Las vistas creadas están en la carpeta `Vistas/`.
 
 ---
 
-##  Notas de seguridad
+## Documentos
+
+Las decisiones técnicas (por qué cada arquitectura, base de datos, patrones y SOLID) y la guía de estudio para la sustentación están en la carpeta `Documento/`.
+
+---
+
+## Notas de seguridad
 
 - Las claves de cifrado **no están en el código**: vienen de variables de entorno.
 - C1 **no almacena datos personales**, solo estructura.
-- El `.env` y las bases `*.db` están en `.gitignore`.
+- El `.env` y las bases `*.db` están en `.gitignore`. En el repositorio solo hay archivos `.env.example` con valores de relleno.
 - La autenticación real y un gestor de secretos quedan fuera del alcance (ver límites en el documento de decisiones técnicas).
 
 ---
@@ -264,10 +213,10 @@ Luego, en Archi: **File → Import → Open Exchange XML Model…** y elige `mod
 ## Equipo
 
 | Integrante |
-|---|---|
-| María Alexandra Jiménez Suárez
-| Juan José Álvarez Restrepo
-| Carolina Ramírez Lotero
-| Natalia Giraldo Morales
+|---|
+| María Alexandra Jiménez Suárez |
+| Juan José Álvarez Restrepo |
+| Carolina Ramírez Lotero |
+| Natalia Giraldo Morales |
 
-**Materia:** Arquitectura de Software · **Docente:** Cesar López  · **Periodo:** [2026-2]
+**Materia:** Arquitectura de Software · **Docente:** César López · **Periodo:** [2026-2]
