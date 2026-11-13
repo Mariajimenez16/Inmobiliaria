@@ -1,0 +1,25 @@
+services:
+  c2:
+    build: .
+    container_name: hogar-andino-c2
+    ports:
+      - "8012:8012"
+    env_file:
+      - .env
+    volumes:
+      - c2_datos:/data
+    restart: unless-stopped
+
+  cliente:
+    build: .
+    profiles: ["cliente"]
+    depends_on:
+      - c2
+    environment:
+      C2_URL: http://c2:8012
+    stdin_open: true
+    tty: true
+    command: ["python", "-m", "c2_atributos.cliente"]
+
+volumes:
+  c2_datos:

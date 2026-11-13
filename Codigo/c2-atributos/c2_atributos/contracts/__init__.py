@@ -1,0 +1,1 @@
+"""Contratos publicos de C2 (Published Language). Version V1, solo tipos primitivos."""

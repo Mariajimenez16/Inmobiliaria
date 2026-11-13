@@ -1,0 +1,1 @@
+"""C2 - Atributos de negocio (microservicio). Hogar Andino, Ley 1581."""

@@ -1,0 +1,38 @@
+# ---------- Secretos (lo más importante) ----------
+.env
+*.env
+!.env.example
+
+# ---------- Bases de datos locales (SQLite) ----------
+datos/
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ---------- Python (C2) ----------
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# ---------- .NET / C# (C1) ----------
+bin/
+obj/
+.vs/
+*.user
+TestResults/
+
+# ---------- Editores y sistema ----------
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
+
+# ---------- Archivos temporales ----------
+*.zip
+*.log
+salida_archimate/

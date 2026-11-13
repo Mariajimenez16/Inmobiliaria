@@ -1,0 +1,1 @@
+"""Capa de aplicacion de C2: casos de uso (CQRS + mediador + pipeline). Depende solo del dominio y de puertos."""

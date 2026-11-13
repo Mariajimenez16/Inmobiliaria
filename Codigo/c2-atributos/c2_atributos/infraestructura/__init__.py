@@ -1,0 +1,1 @@
+"""Capa de infraestructura de C2: implementa los puertos de la aplicacion (SQLite, Fernet, cache, bus)."""

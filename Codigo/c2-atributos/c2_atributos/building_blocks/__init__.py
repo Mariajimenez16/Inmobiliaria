@@ -1,0 +1,1 @@
+"""BuildingBlocks (kernel compartido, diapositiva 9b): piezas genericas de DDD sin reglas de negocio."""

@@ -1,0 +1,1 @@
+"""Capa de dominio de C2: agregado Atributo de negocio (V6.b). No depende de nada externo."""

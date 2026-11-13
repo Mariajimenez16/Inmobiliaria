@@ -1,0 +1,1 @@
+"""Cliente de consola de C2: habla con el microservicio por HTTP."""

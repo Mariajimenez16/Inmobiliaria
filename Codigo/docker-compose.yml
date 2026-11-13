@@ -1,0 +1,34 @@
+# Levanta C1 y C2 juntos. C1 envia el evento "Fuente registrada" a C2 por la red interna (http://c2:8012).
+services:
+  c2:
+    build: ./c2-atributos
+    container_name: hogar-andino-c2
+    ports:
+      - "8012:8012"
+    environment:
+      C2_ENTORNO: prod
+      C2_CLAVE_CIFRADO: ${C2_CLAVE_CIFRADO:?defina C2_CLAVE_CIFRADO en el archivo .env}
+      C2_SIMULACION: "1"        # las rutas /v1/simulacion/* se necesitan para la demostracion
+    volumes:
+      - c2_datos:/data
+    restart: unless-stopped
+
+  c1:
+    build: ./c1-fuentes
+    container_name: hogar-andino-c1
+    ports:
+      - "8011:8011"
+    environment:
+      C1_ENTORNO: prod
+      C1_CLAVE_CIFRADO: ${C1_CLAVE_CIFRADO:?defina C1_CLAVE_CIFRADO en el archivo .env}
+      C2_URL: http://c2:8012
+    depends_on:
+      c2:
+        condition: service_healthy
+    volumes:
+      - c1_datos:/data
+    restart: unless-stopped
+
+volumes:
+  c1_datos:
+  c2_datos:

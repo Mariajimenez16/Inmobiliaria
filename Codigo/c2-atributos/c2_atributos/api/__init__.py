@@ -1,0 +1,1 @@
+"""Capa API de C2 (adaptador HTTP de entrada). Solo traduce HTTP <-> comandos/consultas."""
